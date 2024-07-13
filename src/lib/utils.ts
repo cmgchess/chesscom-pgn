@@ -36,14 +36,39 @@ export function decodeTCNtoUCI(e: string): UCI {
   return f[0];
 }
 
-export function getPgnFromUCI(uci: UCI[], pgnHeaders: PgnHeaders): string {
-  const headers = Object.entries(pgnHeaders).flatMap(([k, v]) => [
-    k,
-    v.toString(),
-  ]);
+export function getPgnFromUCI(
+  uci: UCI[],
+  pgnHeaders: PgnHeaders,
+  moveTimes: number[]
+): string {
+  const headers = Object.entries(pgnHeaders).reduce<string[]>((acc, [k, v]) => {
+    if (!moveTimes.length || k !== 'Termination') acc.push(k, v.toString());
+    return acc;
+  }, []);
   const chess = new Chess();
   chess.header(...headers);
-  uci.forEach((move) => chess.move(move));
-  const pgn = chess.pgn();
-  return pgn;
+  uci.forEach((move, i) => {
+    chess.move(move);
+    if (!moveTimes[i]) return;
+    const termination =
+      i === moveTimes.length - 2 ? ` ${pgnHeaders.Termination}` : '';
+    chess.setComment(`[%emt ${moveTimes[i]}]${termination}`);
+  });
+  return chess.pgn();
+}
+
+export function getMoveTimes(
+  moveTimestamps: string,
+  timeIncrement: number,
+  baseTime: number
+): number[] {
+  const timeList = moveTimestamps.split(',').map(Number);
+  const moveTimes = timeList.map((time: number, i: number) => {
+    if (i === 0 || i === 1) {
+      return (baseTime - time + timeIncrement) / 10 || 0.1;
+    } else {
+      return (timeList[i - 2] - time + timeIncrement) / 10 || 0.1;
+    }
+  });
+  return moveTimes;
 }
