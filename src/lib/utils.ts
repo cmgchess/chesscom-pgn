@@ -36,14 +36,36 @@ export function decodeTCNtoUCI(e: string): UCI {
   return f[0];
 }
 
-export function getPgnFromUCI(uci: UCI[], pgnHeaders: PgnHeaders): string {
+export function getPgnFromUCI(
+  uci: UCI[],
+  pgnHeaders: PgnHeaders,
+  moveTimes?: number[]
+): string {
   const headers = Object.entries(pgnHeaders).flatMap(([k, v]) => [
     k,
     v.toString(),
   ]);
   const chess = new Chess();
   chess.header(...headers);
-  uci.forEach((move) => chess.move(move));
-  const pgn = chess.pgn();
-  return pgn;
+  uci.forEach((move, i) => {
+    chess.move(move);
+    if (moveTimes?.[i]) chess.setComment(`[%emt ${moveTimes[i]}]`);
+  });
+  return chess.pgn();
+}
+
+export function getMoveTimes(
+  moveTimestamps: string,
+  timeIncrement: number,
+  baseTime: number
+): number[] {
+  const timeList = moveTimestamps.split(',').map(Number);
+  const moveTimes = timeList.map((time: number, i: number) => {
+    if (i === 0 || i === 1) {
+      return (baseTime - time + timeIncrement) / 10;
+    } else {
+      return (timeList[i - 2] - time + timeIncrement) / 10;
+    }
+  });
+  return moveTimes;
 }
