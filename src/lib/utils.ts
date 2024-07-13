@@ -62,9 +62,9 @@ export function getMoveTimes(
   const timeList = moveTimestamps.split(',').map(Number);
   const moveTimes = timeList.map((time: number, i: number) => {
     if (i === 0 || i === 1) {
-      return (baseTime - time + timeIncrement) / 10;
+      return (baseTime - time + timeIncrement) / 10 || 0.1;
     } else {
-      return (timeList[i - 2] - time + timeIncrement) / 10;
+      return (timeList[i - 2] - time + timeIncrement) / 10 || 0.1;
     }
   });
   return moveTimes;
