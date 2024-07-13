@@ -39,17 +39,20 @@ export function decodeTCNtoUCI(e: string): UCI {
 export function getPgnFromUCI(
   uci: UCI[],
   pgnHeaders: PgnHeaders,
-  moveTimes?: number[]
+  moveTimes: number[]
 ): string {
-  const headers = Object.entries(pgnHeaders).flatMap(([k, v]) => [
-    k,
-    v.toString(),
-  ]);
+  const headers = Object.entries(pgnHeaders).reduce<string[]>((acc, [k, v]) => {
+    if (!moveTimes.length || k !== 'Termination') acc.push(k, v.toString());
+    return acc;
+  }, []);
   const chess = new Chess();
   chess.header(...headers);
   uci.forEach((move, i) => {
     chess.move(move);
-    if (moveTimes?.[i]) chess.setComment(`[%emt ${moveTimes[i]}]`);
+    if (!moveTimes[i]) return;
+    const termination =
+      i === moveTimes.length - 2 ? ` ${pgnHeaders.Termination}` : '';
+    chess.setComment(`[%emt ${moveTimes[i]}]${termination}`);
   });
   return chess.pgn();
 }
