@@ -16,6 +16,9 @@
     "react-dom": "^18",
     "swagger-ui-react": "^5.17.14"
   },
+  "engines": {
+    "node": ">=20"
+  },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
