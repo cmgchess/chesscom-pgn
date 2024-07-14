@@ -12,6 +12,8 @@ import { NextResponse } from 'next/server';
  * /api/game/{id}:
  *   get:
  *     summary: Retrieve PGN for a game by ID
+ *     tags:
+ *       - PGN
  *     parameters:
  *       - name: id
  *         in: path
@@ -26,7 +28,7 @@ import { NextResponse } from 'next/server';
  *         schema:
  *           type: boolean
  *         description: Whether to include move timestamps in the pgn
- *     description: Can retrieve a chess.com game PGN given the id with/without move timestamps
+ *     description: Can retrieve a chess.com game PGN given the ID with/without move timestamps. Timestamp format is based on Chessbase.
  *     responses:
  *       200:
  *         description: Success
