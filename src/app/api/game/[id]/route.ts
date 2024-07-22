@@ -78,7 +78,12 @@ export async function GET(
         game.game.timeIncrement1,
         game.game.baseTime1
       );
-    const pgn = getPgnFromUCI(decodedMoveList, game.game.pgnHeaders, moveTimes);
+    const pgn = getPgnFromUCI(
+      decodedMoveList,
+      game.game.pgnHeaders,
+      moveTimes,
+      game.game.initialSetup
+    );
     const response = new NextResponse(pgn);
     response.headers.set('Content-type', 'text/plain');
     return response;

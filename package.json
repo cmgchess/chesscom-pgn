@@ -1,5 +1,5 @@
 {
-  "name": "chesscom",
+  "name": "chesscom-pgn",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "chess.js": "^1.0.0-beta.8",
+    "chessops": "^0.14.1",
     "next": "14.2.5",
     "next-swagger-doc": "^0.4.0",
     "react": "^18",
