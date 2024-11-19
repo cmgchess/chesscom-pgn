@@ -4,17 +4,24 @@ import {
   getGameById,
   getMoveTimes,
   getPgnFromUCI,
-} from '@/lib/utils';
+} from '../../../../../lib/utils';
 import { NextResponse } from 'next/server';
 
 /**
  * @swagger
- * /api/game/{id}:
+ * /api/game/{format}/{id}:
  *   get:
- *     summary: Retrieve PGN for a game by ID
+ *     summary: Retrieve PGN for a game by ID and format
  *     tags:
  *       - PGN
  *     parameters:
+ *       - name: format
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [live, daily]
+ *         description: format of the game to retrieve
  *       - name: id
  *         in: path
  *         required: true
@@ -28,7 +35,7 @@ import { NextResponse } from 'next/server';
  *         schema:
  *           type: boolean
  *         description: Whether to include move timestamps in the pgn
- *     description: Can retrieve a chess.com game PGN given the ID with/without move timestamps. Timestamp format is based on Chessbase.
+ *     description: Can retrieve a chess.com game PGN given the ID and format with/without move timestamps. Timestamp format is based on Chessbase.
  *     responses:
  *       200:
  *         description: Success
@@ -60,23 +67,27 @@ import { NextResponse } from 'next/server';
  */
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { gameId: string; gameFormat: "live" | "daily"}  }
 ) {
   try {
     const url = new URL(req.url);
     const showTimestamp =
       url.searchParams.get('timestamp')?.toLowerCase() === 'true';
 
-    const game = await getGameById(params.id);
+    const game = await getGameById({
+        gameId: params.gameId,
+        gameFormat: params.gameFormat
+    });
+    console.log(game)
     if (!game.game) return new NextResponse('Bad request', { status: 400 });
     const moveList = chunkString(game.game.moveList, 2);
     const decodedMoveList = moveList.map((move) => decodeTCNtoUCI(move));
     let moveTimes: number[] = [];
     if (showTimestamp)
       moveTimes = getMoveTimes(
-        game.game.moveTimestamps,
-        game.game.timeIncrement1,
-        game.game.baseTime1
+        game.game.moveTimestamps??"",
+        game.game.timeIncrement1??0,
+        game.game.baseTime1??0
       );
     const pgn = getPgnFromUCI(
       decodedMoveList,
