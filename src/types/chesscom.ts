@@ -21,9 +21,9 @@ export interface Game {
     isResignable: boolean;
     lastMove: string;
     moveList: string;
-    name?: string;
     plyCount: number;
-    ratingChange?: number;
+    ratingChangeWhite?: number;
+    ratingChangeBlack?: number;
     gameEndReason: string;
     resultMessage: string;
     startTime?: number;
@@ -31,7 +31,7 @@ export interface Game {
     turnColor: string;
     type: string;
     typeName: string;
-    allowVacation: boolean;
+    allowVacation?: boolean;
     pgnHeaders: PgnHeaders;
     moveTimestamps?: string;
     baseTime1?: number;
@@ -47,15 +47,16 @@ export interface Player {
     countryId: number;
     isEnabled: boolean;
     canWinOnTime: boolean;
+    chessTitle?: string;
     color: string;
     countryName: string;
     defaultTab: number;
     hasMovedAtLeastOnce: boolean;
     isDrawable: boolean;
     isOnline: boolean;
-    isInLivechess: boolean;
+    isInLivechess?: boolean;
     isTouchMove: boolean;
-    isVacation: boolean;
+    isVacation?: boolean;
     isWhiteOnBottom: boolean;
     lastLoginDate: number;
     location: string;
@@ -65,11 +66,11 @@ export interface Player {
     offeredDraw?: boolean;
     postMoveAction: string;
     rating: number;
-    turnTimeRemaining: string;
-    flairCode: string;
+    turnTimeRemaining?: string;
+    flairCode?: string;
     flair?: Flair;
     username: string;
-    vacationRemaining: string;
+    vacationRemaining?: string;
     gamesInProgress: number;
     friendRequestSent: boolean;
     friendRequestReceived: boolean;
@@ -94,6 +95,7 @@ export interface PgnHeaders {
     SetUp: string;
     FEN: string;
 }
+
 export interface Flair {
     id: string;
     images: {

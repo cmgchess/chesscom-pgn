@@ -14,9 +14,12 @@ export async function getGameById({
     gameId: string;
     gameFormat: "live" | "daily";
 }): Promise<ChessComGame> {
-    const game = await fetch(
-        `https://www.chess.com/callback/${gameFormat}/game/${gameId}`,
-    );
+    const url =
+        gameFormat === "daily"
+            ? `https://www.chess.com/callback/daily/game/${gameId}`
+            : `https://www.chess.com/callback/live/game/${gameId}`;
+
+    const game = await fetch(url);
     return await game.json();
 }
 

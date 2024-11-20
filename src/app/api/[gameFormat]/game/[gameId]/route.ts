@@ -4,12 +4,12 @@ import {
   getGameById,
   getMoveTimes,
   getPgnFromUCI,
-} from '../../../../../lib/utils';
+} from '@/lib/utils';
 import { NextResponse } from 'next/server';
 
 /**
  * @swagger
- * /api/game/{format}/{id}:
+ * /api/{format}/game/{id}:
  *   get:
  *     summary: Retrieve PGN for a game by ID and format
  *     tags:
@@ -71,17 +71,24 @@ export async function GET(
 ) {
   try {
     const url = new URL(req.url);
+    console.log(url)
     const showTimestamp =
       url.searchParams.get('timestamp')?.toLowerCase() === 'true';
+    console.log(showTimestamp)
 
     const game = await getGameById({
         gameId: params.gameId,
         gameFormat: params.gameFormat
     });
+    console.log(params.gameId)
+    console.log(params.gameFormat)
     console.log(game)
-    if (!game.game) return new NextResponse('Bad request', { status: 400 });
+    console.log("passed 3")
+    if (!game.game) return new NextResponse('Bad request', { status: 401 });
     const moveList = chunkString(game.game.moveList, 2);
+    console.log("passed 4");
     const decodedMoveList = moveList.map((move) => decodeTCNtoUCI(move));
+    console.log("passed 5")
     let moveTimes: number[] = [];
     if (showTimestamp)
       moveTimes = getMoveTimes(
@@ -89,14 +96,17 @@ export async function GET(
         game.game.timeIncrement1??0,
         game.game.baseTime1??0
       );
+    console.log("passed 6")
     const pgn = getPgnFromUCI(
       decodedMoveList,
       game.game.pgnHeaders,
       moveTimes,
       game.game.initialSetup
     );
+    console.log("passed 7")
     const response = new NextResponse(pgn);
     response.headers.set('Content-type', 'text/plain');
+    console.log("passed 8")
     return response;
   } catch (e) {
     console.error(e);
