@@ -5,6 +5,7 @@ import {
   getMoveTimes,
   getPgnFromUCI,
 } from '@/lib/utils';
+import { Format } from '@/types/chesscom';
 import { NextResponse } from 'next/server';
 
 /**
@@ -61,7 +62,7 @@ import { NextResponse } from 'next/server';
  */
 export async function GET(
   req: Request,
-  {params} : {params: {id: string; format: "live" | "daily"}}
+  { params }: { params: { id: string } }
 ) {
   try {
     const url = new URL(req.url);
@@ -69,7 +70,8 @@ export async function GET(
       url.searchParams.get('timestamp')?.toLowerCase() === 'true';
 
     const game = await getGameById({
-        id: params.id, format: "live"
+      id: params.id,
+      format: Format.Live,
     });
     if (!game.game) return new NextResponse('Bad request', { status: 401 });
     const moveList = chunkString(game.game.moveList, 2);
@@ -77,9 +79,9 @@ export async function GET(
     let moveTimes: number[] = [];
     if (showTimestamp)
       moveTimes = getMoveTimes(
-        game.game.moveTimestamps??"",
-        game.game.timeIncrement1??0,
-        game.game.baseTime1??0
+        game.game.moveTimestamps ?? '',
+        game.game.timeIncrement1 ?? 0,
+        game.game.baseTime1 ?? 0
       );
     const pgn = getPgnFromUCI(
       decodedMoveList,
@@ -95,4 +97,3 @@ export async function GET(
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }
-

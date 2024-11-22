@@ -4,6 +4,7 @@ import {
   getGameById,
   getPgnFromUCI,
 } from '@/lib/utils';
+import { Format } from '@/types/chesscom';
 import { NextResponse } from 'next/server';
 
 /**
@@ -52,14 +53,13 @@ import { NextResponse } from 'next/server';
  *         description: Internal server error
  */
 export async function GET(
-    req: Request,
-    {params} : {params: {id: string; format: "live" | "daily"}}
+  req: Request,
+  { params }: { params: { id: string } }
 ) {
   try {
-      
     const game = await getGameById({
-        id: params.id,
-        format: "daily"
+      id: params.id,
+      format: Format.Daily,
     });
     if (!game.game) return new NextResponse('Bad request', { status: 401 });
     const moveList = chunkString(game.game.moveList, 2);
