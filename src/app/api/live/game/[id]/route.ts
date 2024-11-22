@@ -9,9 +9,9 @@ import { NextResponse } from 'next/server';
 
 /**
  * @swagger
- * /api/game/{id}:
+ * /api/live/game/{id}:
  *   get:
- *     summary: Retrieve PGN for a game by ID
+ *     summary: Retrieve PGN for a live(not daily) game by ID
  *     tags:
  *       - PGN
  *     parameters:
@@ -28,7 +28,8 @@ import { NextResponse } from 'next/server';
  *         schema:
  *           type: boolean
  *         description: Whether to include move timestamps in the pgn
- *     description: Can retrieve a chess.com game PGN given the ID with/without move timestamps. Timestamp format is based on Chessbase.
+ *     description: Can retrieve a chess.com game PGN given the ID and format with/without move timestamps. Timestamp format is based on Chessbase.
+ *
  *     responses:
  *       200:
  *         description: Success
@@ -60,23 +61,25 @@ import { NextResponse } from 'next/server';
  */
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  {params} : {params: {id: string; format: "live" | "daily"}}
 ) {
   try {
     const url = new URL(req.url);
     const showTimestamp =
       url.searchParams.get('timestamp')?.toLowerCase() === 'true';
 
-    const game = await getGameById(params.id);
-    if (!game.game) return new NextResponse('Bad request', { status: 400 });
+    const game = await getGameById({
+        id: params.id, format: "live"
+    });
+    if (!game.game) return new NextResponse('Bad request', { status: 401 });
     const moveList = chunkString(game.game.moveList, 2);
     const decodedMoveList = moveList.map((move) => decodeTCNtoUCI(move));
     let moveTimes: number[] = [];
     if (showTimestamp)
       moveTimes = getMoveTimes(
-        game.game.moveTimestamps,
-        game.game.timeIncrement1,
-        game.game.baseTime1
+        game.game.moveTimestamps??"",
+        game.game.timeIncrement1??0,
+        game.game.baseTime1??0
       );
     const pgn = getPgnFromUCI(
       decodedMoveList,
@@ -92,3 +95,4 @@ export async function GET(
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }
+
