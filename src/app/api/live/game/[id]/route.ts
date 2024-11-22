@@ -9,19 +9,12 @@ import { NextResponse } from 'next/server';
 
 /**
  * @swagger
- * /api/{format}/game/{id}:
+ * /api/live/game/{id}:
  *   get:
- *     summary: Retrieve PGN for a game by ID and format
+ *     summary: Retrieve PGN for a live(not daily) game by ID
  *     tags:
  *       - PGN
  *     parameters:
- *       - name: format
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *           enum: [live, daily]
- *         description: format of the game to retrieve
  *       - name: id
  *         in: path
  *         required: true
@@ -36,6 +29,7 @@ import { NextResponse } from 'next/server';
  *           type: boolean
  *         description: Whether to include move timestamps in the pgn
  *     description: Can retrieve a chess.com game PGN given the ID and format with/without move timestamps. Timestamp format is based on Chessbase.
+ *
  *     responses:
  *       200:
  *         description: Success
@@ -67,28 +61,19 @@ import { NextResponse } from 'next/server';
  */
 export async function GET(
   req: Request,
-  { params }: { params: { gameId: string; gameFormat: "live" | "daily"}  }
+  {params} : {params: {id: string; format: "live" | "daily"}}
 ) {
   try {
     const url = new URL(req.url);
-    console.log(url)
     const showTimestamp =
       url.searchParams.get('timestamp')?.toLowerCase() === 'true';
-    console.log(showTimestamp)
 
     const game = await getGameById({
-        gameId: params.gameId,
-        gameFormat: params.gameFormat
+        id: params.id, format: "live"
     });
-    console.log(params.gameId)
-    console.log(params.gameFormat)
-    console.log(game)
-    console.log("passed 3")
     if (!game.game) return new NextResponse('Bad request', { status: 401 });
     const moveList = chunkString(game.game.moveList, 2);
-    console.log("passed 4");
     const decodedMoveList = moveList.map((move) => decodeTCNtoUCI(move));
-    console.log("passed 5")
     let moveTimes: number[] = [];
     if (showTimestamp)
       moveTimes = getMoveTimes(
@@ -96,20 +81,18 @@ export async function GET(
         game.game.timeIncrement1??0,
         game.game.baseTime1??0
       );
-    console.log("passed 6")
     const pgn = getPgnFromUCI(
       decodedMoveList,
       game.game.pgnHeaders,
       moveTimes,
       game.game.initialSetup
     );
-    console.log("passed 7")
     const response = new NextResponse(pgn);
     response.headers.set('Content-type', 'text/plain');
-    console.log("passed 8")
     return response;
   } catch (e) {
     console.error(e);
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }
+

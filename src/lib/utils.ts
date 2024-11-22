@@ -8,18 +8,15 @@ import { defaultGame, extend, Game, makePgn, PgnNodeData } from "chessops/pgn";
 import { makeSanAndPlay } from "chessops/san";
 
 export async function getGameById({
-    gameId,
-    gameFormat,
+    id,
+    format,
 }: {
-    gameId: string;
-    gameFormat: "live" | "daily";
+    id: string;
+    format: "live" | "daily";
 }): Promise<ChessComGame> {
-    const url =
-        gameFormat === "daily"
-            ? `https://www.chess.com/callback/daily/game/${gameId}`
-            : `https://www.chess.com/callback/live/game/${gameId}`;
-
-    const game = await fetch(url);
+    const game = await fetch(
+        `https://www.chess.com/callback/${format}/game/${id}`,
+    );
     return await game.json();
 }
 
