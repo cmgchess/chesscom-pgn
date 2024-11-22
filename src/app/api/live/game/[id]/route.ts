@@ -12,7 +12,7 @@ import { NextResponse } from 'next/server';
  * @swagger
  * /api/live/game/{id}:
  *   get:
- *     summary: Retrieve PGN for a live(not daily) game by ID
+ *     summary: Retrieve PGN for a live game by ID
  *     tags:
  *       - PGN
  *     parameters:
@@ -29,7 +29,7 @@ import { NextResponse } from 'next/server';
  *         schema:
  *           type: boolean
  *         description: Whether to include move timestamps in the pgn
- *     description: Can retrieve a chess.com game PGN given the ID and format with/without move timestamps. Timestamp format is based on Chessbase.
+ *     description: Can retrieve a chess.com live game PGN given the ID with/without move timestamps. Timestamp format is based on Chessbase.
  *
  *     responses:
  *       200:
