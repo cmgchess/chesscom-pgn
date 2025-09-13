@@ -17,5 +17,5 @@ This string is twice the length of the total number of moves (PlyCount), meaning
 ## Resources
 
 - https://www.chess.com/clubs/forum/view/official-chess-com-movelist-pgn-help
-- https://github.com/savi2w/chess-tcn/blob/main/tcn.js
+- https://github.com/chess-tcn/chess-tcn-js/blob/main/src/index.js
 - https://github.com/niklasf/chessops
